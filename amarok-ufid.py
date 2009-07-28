@@ -5,7 +5,6 @@
 import __future__
 
 import getopt, sys, os, re, mimetypes, logging
-from exception import *
 from stat import *
 
 scriptname = os.path.basename(sys.argv[0])
