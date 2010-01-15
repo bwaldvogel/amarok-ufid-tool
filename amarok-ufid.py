@@ -11,6 +11,7 @@ scriptname = os.path.basename(sys.argv[0])
 ufidFile = "ufid.dump"
 directory = u"."
 force = False
+notify = False
 filePattern = re.compile(r".+\.(flac|mp3)")
 
 # init logging
@@ -71,6 +72,10 @@ def dump():
         out.close();
 
     logger.info("done writing '%s'. copy the file to the target directory and call '%s apply'" % (ufidFile, scriptname))
+
+    if (notify):
+        os.system("notify-send \"" + scriptname + "\" \"finished dump\"")
+
 
 def apply():
     files = os.listdir(directory)
@@ -144,6 +149,8 @@ def apply():
         sys.exit(1)
 
     logger.info("done")
+    if (notify):
+        os.system("notify-send \"" + scriptname + "\" \"finished dump\"")
 
 
 def usage():
@@ -153,6 +160,7 @@ def usage():
     print "   -o, --file=FILE   dump file (default: " + ufidFile + ")"
     print "   -f, --force       force overwriting existing data"
     print "   -v                be verbose"
+    print "   -n                notify"
     print "   -h, --help        print the help and exit"
     print ""
     print "COMMAND:"
@@ -161,10 +169,10 @@ def usage():
     print ""
 
 def main():
-    global force, ufidFile
+    global force, ufidFile, notify
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hd:fv", ["help", "dump=", "force"])
+        opts, args = getopt.getopt(sys.argv[1:], "hd:fvn", ["help", "dump=", "force", "notify"])
     except getopt.GetoptError, err:
         print str(err) # will print something like "option -a not recognized"
         usage()
@@ -180,6 +188,8 @@ def main():
             ufidFile = a
         elif o in ("-f", "--force"):
             force = True
+        elif o in ("-n", "--notify"):
+            notify = True
         else:
             assert False, "unhandled option"
 
