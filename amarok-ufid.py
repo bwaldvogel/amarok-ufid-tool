@@ -150,7 +150,7 @@ def apply():
 
     logger.info("done")
     if (notify):
-        os.system("notify-send \"" + scriptname + "\" \"finished dump\"")
+        os.system("notify-send \"" + scriptname + "\" \"finished apply\"")
 
 
 def usage():
