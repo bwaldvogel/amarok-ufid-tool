@@ -12,7 +12,7 @@ ufidFile = "ufid.dump"
 directory = u"."
 force = False
 notify = False
-filePattern = re.compile(r".+\.(flac|mp3)")
+filePattern = re.compile(r".+\.(flac|mp3|ogg)")
 
 # init logging
 logger = logging.getLogger("simple_example")
@@ -54,11 +54,17 @@ def dump():
             musicbrainzUFID = fm["musicbrainz_trackid"][0]
             ufidOwner = 'Amarok 2 AFTv1 - amarok.kde.org'
             ufidData = fm["amarok 2 aftv1 - amarok.kde.org"][0]
-        else:
+        elif (mimetype == "audio/mpeg"):
             musicbrainzUFID = fm["UFID:http://musicbrainz.org"].data
             amarokUFID = fm.get("UFID:Amarok 2 AFTv1 - amarok.kde.org")
             ufidOwner = amarokUFID.owner
             ufidData = amarokUFID.data
+        elif (mimetype == "audio/ogg"):
+            musicbrainzUFID = fm["musicbrainz_trackid"][0]
+            ufidOwner = 'Amarok 2 AFTv1 - amarok.kde.org'
+            ufidData = fm.get("amarok 2 aftv1 - amarok.kde.org")[0]
+        else:
+            raise Exception("unknown mimtype %s" % (mimetype))
 
         logger.debug(" %-50s %s" % (path, musicbrainzUFID))
         line = musicbrainzUFID + " maps to '" + ufidOwner + "' " + ufidData + " (" + path + ")"
