@@ -145,9 +145,13 @@ def apply(directory, ufid_file, force, notify, file_pattern):
             logger.error("'%s' has no MusicBrainz track id. was the file properly tagged with picard?" % (f))
             sys.exit(1)
 
-        if not musicbrainz_ufid in ufids:
-            logger.error("no UFID mapping for '%s'" % (f))
-            sys.exit(1)
+        if musicbrainz_ufid not in ufids:
+            if force:
+                logger.warn("no UFID mapping for '%s' - skipping" % (f))
+                continue
+            else:
+                logger.error("no UFID mapping for '%s'" % (f))
+                sys.exit(1)
 
         ufid_owner, ufid_data = ufids[musicbrainz_ufid]
 
