@@ -1,23 +1,17 @@
-#! /usr/bin/env python
-# vim: set fileencoding=utf-8 ts=4 sw=4 et :
-# written by Benedikt Waldvogel
-
-from __future__ import division
-from __future__ import absolute_import
-from __future__ import print_function
+#!/usr/bin/env python3
 
 import getopt
-import sys
+import logging
+import mimetypes
 import os
 import re
-import mimetypes
-import logging
-# from stat import *
+import sys
+
+import mutagen
 
 
 def get_scriptname():
     return os.path.basename(sys.argv[0])
-
 
 # init logging
 logger = logging.getLogger(get_scriptname())
@@ -28,12 +22,6 @@ ch.setLevel(logging.INFO)
 formatter = logging.Formatter("%(message)s")
 ch.setFormatter(formatter)
 logger.addHandler(ch)
-
-try:
-    import mutagen
-except ImportError, err:
-    logger.critical("failed to import mutagen: %s" % (str(err)))
-    sys.exit(1)
 
 
 def parse_line(line):
@@ -63,7 +51,7 @@ def dump(directory, ufid_file, force, notify, file_pattern):
     with open(ufid_file, "w") as out:
         for path in files:
             if os.path.isdir(path):
-                logger.warn("skipping '%s'" % (path))
+                logger.warning("skipping '%s'" % (path))
                 continue
 
             fm = mutagen.File(path)
@@ -95,7 +83,7 @@ def dump(directory, ufid_file, force, notify, file_pattern):
             line = u"%s maps to '%s' %s (%s)" % data
             assert parse_line(line) == data
 
-            out.write(line.encode("utf-8") + "\n")
+            out.write(line + "\n")
 
     logger.info("done writing '%s'. copy the file to the target directory and run with the command 'apply'" % ufid_file)
 
@@ -129,7 +117,7 @@ def apply(directory, ufid_file, force, notify, file_pattern):
     for f in files:
         match = file_pattern.match(f)
         if not match or os.path.isdir(f):
-            logger.warn("skipping '%s'" % (f))
+            logger.warning("skipping '%s'" % (f))
             continue
 
         mimetype, _ = mimetypes.guess_type(f)
@@ -177,7 +165,7 @@ def apply(directory, ufid_file, force, notify, file_pattern):
 
     logger.info("done")
     if notify:
-        os.system("notify-send \"%s\" \"finished apply\"" % get_scriptname())
+        os.system('notify-send "%s" "finished apply"' % get_scriptname())
 
 
 def usage(ufid_file_default):
@@ -202,9 +190,8 @@ def main(directory):
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hd:fvn", ["help", "dump=", "force", "notify"])
-    except getopt.GetoptError, err:
-        print("%s" % str(err), file=sys.stderr)  # will print something like "option -a not recognized"
-        print("", file=sys.stderr)
+    except getopt.GetoptError as err:
+        print(f"{err}\n", file=sys.stderr)
         usage(ufid_file_default)
         sys.exit(2)
 
@@ -242,5 +229,6 @@ def main(directory):
     else:
         assert False, "invalid command: %s" % command
 
+
 if __name__ == "__main__":
-    main(u".")
+    main(".")
